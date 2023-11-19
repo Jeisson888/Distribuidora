@@ -27,6 +27,13 @@ class Grafo:
         else:
             print(f"El nodo con nombre '{nombre}' ya existe en el grafo.")
 
+    def borrar_nodo(self, nombre):
+        if nombre in self.nodos:
+            del self.nodos[nombre]
+            self.aristas = {(n1, n2): arista for (n1, n2), arista in self.aristas.items() if nombre not in (n1, n2)}
+        else:
+            print(f"El nodo con nombre '{nombre}' no existe en el grafo.")
+            
     def agregar_arista(self, nodo_1, nodo_2, costo, tiempo, distancia):
         if (nodo_1, nodo_2) not in self.aristas and (nodo_2, nodo_1) not in self.aristas:
             if nodo_1 in self.nodos and nodo_2 in self.nodos:
@@ -36,3 +43,11 @@ class Grafo:
                 print("Uno o ambos nodos no existen en el grafo.")
         else:
             print(f"La arista entre '{nodo_1}' y '{nodo_2}' ya existe en el grafo.")
+
+    def borrar_arista(self, nodo_1, nodo_2):
+        if (nodo_1, nodo_2) in self.aristas:
+            del self.aristas[(nodo_1, nodo_2)]
+        elif (nodo_2, nodo_1) in self.aristas:
+            del self.aristas[(nodo_2, nodo_1)]
+        else:
+            print(f"No existe una arista entre '{nodo_1}' y '{nodo_2}' en el grafo.")
