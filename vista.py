@@ -135,9 +135,6 @@ class Vista:
         # Limpiar el gráfico antes de actualizar
         self.ax.clear()
 
-        # Aquí debes agregar la lógica para dibujar el grafo en el gráfico (self.ax)
-        # Puedes utilizar métodos como scatter, plot, etc. de matplotlib
-
         # Ejemplo: Dibujar nodos
         for nodo in self.grafo.nodos.values():
             self.ax.scatter(*nodo.ubicacion, label=nodo.nombre)
