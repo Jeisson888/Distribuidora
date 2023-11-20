@@ -12,7 +12,7 @@ class Arista:
         self.distancia = distancia
 
     def calcular_peso(self):
-        return self.costo + self.tiempo + self.distancia
+        return (self.costo * 2) + self.tiempo + self.distancia
 
 class Grafo:
     def __init__(self):
@@ -24,14 +24,14 @@ class Grafo:
             nodo = Nodo(nombre, ubicacion)
             self.nodos[nombre] = nodo
         else:
-            print(f"El nodo con nombre '{nombre}' ya existe en el grafo.")
+            pass
 
     def borrar_nodo(self, nombre):
         if nombre in self.nodos:
             del self.nodos[nombre]
             self.aristas = {(n1, n2): arista for (n1, n2), arista in self.aristas.items() if nombre not in (n1, n2)}
         else:
-            print(f"El nodo con nombre '{nombre}' no existe en el grafo.")
+            pass
             
     def agregar_arista(self, nodo_1, nodo_2, costo, tiempo, distancia):
         if (nodo_1, nodo_2) not in self.aristas and (nodo_2, nodo_1) not in self.aristas:
@@ -39,9 +39,9 @@ class Grafo:
                 ruta = Arista(nodo_1, nodo_2, costo, tiempo, distancia)
                 self.aristas[(nodo_1, nodo_2)] = ruta
             else:
-                print("Uno o ambos nodos no existen en el grafo.")
+                pass
         else:
-            print(f"La arista entre '{nodo_1}' y '{nodo_2}' ya existe en el grafo.")
+            pass
 
     def borrar_arista(self, nodo_1, nodo_2):
         if (nodo_1, nodo_2) in self.aristas:
@@ -49,17 +49,7 @@ class Grafo:
         elif (nodo_2, nodo_1) in self.aristas:
             del self.aristas[(nodo_2, nodo_1)]
         else:
-            print(f"No existe una arista entre '{nodo_1}' y '{nodo_2}' en el grafo.")
+            pass
             
     def existe_arista(self, nodo_1, nodo_2):
-        """
-        Verifica si existe una arista entre los nodos especificados.
-
-        Args:
-        - nodo_1 (str): Nombre del primer nodo.
-        - nodo_2 (str): Nombre del segundo nodo.
-
-        Returns:
-        - bool: True si hay una arista, False de lo contrario.
-        """
         return (nodo_1, nodo_2) in self.aristas or (nodo_2, nodo_1) in self.aristas

@@ -11,7 +11,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 class Vista:
     def __init__(self, master):
         self.master = master
-        self.master.title("Distribuidora")
+        self.master.title("Optimizacion de ruta")
 
         self.contenedor = tk.Frame(master, padx=20, pady=20)
         self.contenedor.pack(expand=True, fill="both")
@@ -356,7 +356,10 @@ class FormularioFB(tk.Frame):
             if mejor_ruta is None:
                 messagebox.showinfo("Solución FB", "No hay rutas disponibles en el grafo. Esto se debe a que hay un nodo problema, por favor verifique que todos los nodos estén debidamente conectados o elimine el nodo problema.")
             else:
-                messagebox.showinfo("Solución FB", f"La mejor ruta es: {mejor_ruta}")
+                solucion = ''
+                for nodo in mejor_ruta:
+                    solucion += nodo + '\n'
+                messagebox.showinfo("Solución Fuerza Bruta", f"La mejor ruta es:\n\n{solucion}")
         self.destroy()
         
 class FormularioVMC(tk.Frame):
@@ -381,7 +384,10 @@ class FormularioVMC(tk.Frame):
         else:
             try:
                 mejor_ruta = vmc.vecino_mas_cercano(self.grafo, origen)
-                messagebox.showinfo("Solución VMC", f"La mejor ruta es: {mejor_ruta}")
+                solucion = ''
+                for nodo in mejor_ruta:
+                    solucion += nodo + '\n'
+                messagebox.showinfo("Solución Fuerza Bruta", f"La mejor ruta es:\n\n{solucion}")
             except KeyError:
                 messagebox.showerror("Error", "No hay rutas disponibles en el grafo. Esto se debe a que hay un nodo problema, por favor verifique que todos los nodos estén debidamente conectados o elimine el nodo problema.")
         self.destroy()
