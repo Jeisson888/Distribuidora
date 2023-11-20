@@ -11,10 +11,6 @@
 - Python
 
 
-## Live Demo (if available)
-
-[Portfolio](https://gioudi.github.io/repository)
-
 ## Getting Started
 
 To get a local copy up and running follow these simple example steps.
