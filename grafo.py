@@ -1,7 +1,6 @@
 class Nodo:
-    def __init__(self, nombre, tipo, ubicacion):
+    def __init__(self, nombre, ubicacion):
         self.nombre = nombre
-        self.tipo = tipo
         self.ubicacion = ubicacion
 
 class Arista:
@@ -20,9 +19,9 @@ class Grafo:
         self.nodos = {}
         self.aristas = {}
 
-    def agregar_nodo(self, nombre, tipo, ubicacion):
+    def agregar_nodo(self, nombre, ubicacion):
         if nombre not in self.nodos:
-            nodo = Nodo(nombre, tipo, ubicacion)
+            nodo = Nodo(nombre, ubicacion)
             self.nodos[nombre] = nodo
         else:
             print(f"El nodo con nombre '{nombre}' ya existe en el grafo.")
@@ -51,3 +50,16 @@ class Grafo:
             del self.aristas[(nodo_2, nodo_1)]
         else:
             print(f"No existe una arista entre '{nodo_1}' y '{nodo_2}' en el grafo.")
+            
+    def existe_arista(self, nodo_1, nodo_2):
+        """
+        Verifica si existe una arista entre los nodos especificados.
+
+        Args:
+        - nodo_1 (str): Nombre del primer nodo.
+        - nodo_2 (str): Nombre del segundo nodo.
+
+        Returns:
+        - bool: True si hay una arista, False de lo contrario.
+        """
+        return (nodo_1, nodo_2) in self.aristas or (nodo_2, nodo_1) in self.aristas
