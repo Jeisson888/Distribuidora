@@ -40,11 +40,17 @@ To get a local copy up and running follow these simple example steps.
    pip install matplotlib
    ```
 3. para ejecutar este proyecto nos ubicamos en la clase vista
+
+   
    ![image](https://github.com/Jeisson888/Distribuidora/assets/126002005/19970950-a0d1-481a-b665-e76c9e5aaad9)
+
 4.luego al ejecutar esta clase nos aparecera la siguiente interfaz
 
 
-5. 
+![image](https://github.com/Jeisson888/Distribuidora/assets/126002005/4f7ff377-139d-4506-9c44-5e9e546728fd)
+
+
+
    
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
