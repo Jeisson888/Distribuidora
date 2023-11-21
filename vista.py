@@ -86,22 +86,22 @@ class Vista:
 
     def crear_nodo(self):
         self.destruir_formulario_actual()
-        self.formulario_actual = FormularioCrearNodo(self.grafo, self.panel_formularios)
+        self.formulario_actual = FormularioCrearNodo(self.grafo, self.panel_formularios, self)
         self.actualizar_visualizacion()
 
     def borrar_nodo(self):
         self.destruir_formulario_actual()
-        self.formulario_actual = FormularioBorrarNodo(self.grafo, self.panel_formularios)
+        self.formulario_actual = FormularioBorrarNodo(self.grafo, self.panel_formularios, self)
         self.actualizar_visualizacion()
 
     def crear_arista(self):
         self.destruir_formulario_actual()
-        self.formulario_actual = FormularioCrearArista(self.grafo, self.panel_formularios)
+        self.formulario_actual = FormularioCrearArista(self.grafo, self.panel_formularios, self)
         self.actualizar_visualizacion()
 
     def borrar_arista(self):
         self.destruir_formulario_actual()
-        self.formulario_actual = FormularioBorrarArista(self.grafo, self.panel_formularios)
+        self.formulario_actual = FormularioBorrarArista(self.grafo, self.panel_formularios, self)
         self.actualizar_visualizacion()
 
     def solucion_fb(self):
@@ -154,9 +154,10 @@ class Vista:
         self.canvas.draw()
      
 class FormularioCrearNodo(tk.Frame):
-    def __init__(self, grafo, master=None):
+    def __init__(self, grafo, master=None, vista=None):
         super().__init__(master)
         self.grafo = grafo
+        self.vista = vista
         self.configure(bg='#E0E0E0')
         self.pack(fill="both", expand=True)
 
@@ -164,18 +165,23 @@ class FormularioCrearNodo(tk.Frame):
         self.nombre_entry = tk.Entry(self)
         self.nombre_entry.pack(pady=3)
 
-        tk.Label(self, text="Ubicación (x, y):", bg='#E0E0E0').pack(pady=3)
-        self.ubicacion_entry = tk.Entry(self)
-        self.ubicacion_entry.pack(pady=3)
+        tk.Label(self, text="Ubicación en el eje X:", bg='#E0E0E0').pack(pady=3)
+        self.ubicacion_x_entry = tk.Entry(self)
+        self.ubicacion_x_entry.pack(pady=3)
+
+        tk.Label(self, text="Ubicación en el eje Y:", bg='#E0E0E0').pack(pady=3)
+        self.ubicacion_y_entry = tk.Entry(self)
+        self.ubicacion_y_entry.pack(pady=3)
 
         guardar_btn = tk.Button(self, text="Guardar", command=self.guardar, bg='green', fg='white')
         guardar_btn.pack(pady=5)
 
     def guardar(self):
         nombre = self.nombre_entry.get()
-        ubicacion_str = self.ubicacion_entry.get()
+        ubicacion_x_str = self.ubicacion_x_entry.get()
+        ubicacion_y_str = self.ubicacion_y_entry.get()
 
-        if not nombre or not ubicacion_str:
+        if not nombre or not ubicacion_x_str or not ubicacion_y_str:
             messagebox.showerror("Error", "Por favor, completa todos los campos.")
         else:
             try:
@@ -183,22 +189,29 @@ class FormularioCrearNodo(tk.Frame):
                 if nombre in self.grafo.nodos:
                     messagebox.showerror("Error", "Ya existe un lugar con ese nombre.")
                 else:
-                    ubicacion = tuple(map(float, ubicacion_str.split(',')))
+                    # Verificar que las ubicaciones sean números positivos y diferentes de cero
+                    ubicacion_x = float(ubicacion_x_str)
+                    ubicacion_y = float(ubicacion_y_str)
+                    if ubicacion_x <= 0 or ubicacion_y <= 0:
+                        messagebox.showerror("Error", "Las ubicaciones deben ser números positivos y diferentes de cero.")
+                        return
 
                     # Verificar si las coordenadas ya existen en otro nodo
-                    if any(nodo.ubicacion == ubicacion for nodo in self.grafo.nodos.values()):
+                    if any(nodo.ubicacion == (ubicacion_x, ubicacion_y) for nodo in self.grafo.nodos.values()):
                         messagebox.showerror("Error", "Ya existe un lugar en esa ubicación.")
                     else:
-                        self.grafo.agregar_nodo(nombre, ubicacion)
+                        self.grafo.agregar_nodo(nombre, (ubicacion_x, ubicacion_y))
                         messagebox.showinfo("Éxito", "Lugar creado exitosamente.")
+                        self.vista.actualizar_visualizacion()
                         self.destroy()
             except ValueError:
-                messagebox.showerror("Error", "Ubicación inválida. Asegúrate de ingresar las coordenadas como números separados por coma.")
+                messagebox.showerror("Error", "Ubicación inválida. Asegúrate de ingresar las coordenadas como números.")
 
 class FormularioBorrarNodo(tk.Frame):
-    def __init__(self, grafo, master=None):
+    def __init__(self, grafo, master=None, vista=None):
         super().__init__(master)
         self.grafo = grafo
+        self.vista = vista
         self.configure(bg='#E0E0E0')
         self.pack(fill="both", expand=True)
 
@@ -222,12 +235,14 @@ class FormularioBorrarNodo(tk.Frame):
 
         self.grafo.borrar_nodo(nombre)
         messagebox.showinfo("Éxito", "Lugar borrado exitosamente.")
+        self.vista.actualizar_visualizacion()
         self.destroy()
         
 class FormularioCrearArista(tk.Frame):
-    def __init__(self, grafo, master=None):
+    def __init__(self, grafo, master=None, vista=None):
         super().__init__(master)
         self.grafo = grafo
+        self.vista = vista
         self.configure(bg='#E0E0E0')
         self.pack(fill="both", expand=True)
 
@@ -275,25 +290,35 @@ class FormularioCrearArista(tk.Frame):
             messagebox.showerror("Error", "Los lugares 1 y 2 no pueden ser iguales.")
             return
 
-        # Verificar que los campos de costo, tiempo y distancia sean numéricos
+        # Verificar si ya existe una ruta entre los lugares seleccionados
+        if self.grafo.existe_arista(lugar_1, lugar_2):
+            messagebox.showerror("Error", "Ya existe una ruta entre estos dos lugares. Elimine la ruta existente para crear una nueva.")
+            return
+
+        # Verificar que los campos de costo, tiempo y distancia sean numéricos y mayores que 0
         try:
-            costo = int(self.costo_entry.get())
-            tiempo = int(self.tiempo_entry.get())
-            distancia = int(self.distancia_entry.get())
+            costo = float(self.costo_entry.get())
+            tiempo = float(self.tiempo_entry.get())
+            distancia = float(self.distancia_entry.get())
         except ValueError:
             messagebox.showerror("Error", "Ingrese valores numéricos en los campos de costo, tiempo y distancia.")
+            return
+
+        if costo <= 0 or tiempo <= 0 or distancia <= 0:
+            messagebox.showerror("Error", "Los valores de costo, tiempo y distancia deben ser mayores que 0.")
             return
 
         # Agregar la arista al grafo
         self.grafo.agregar_arista(lugar_1, lugar_2, costo, tiempo, distancia)
         messagebox.showinfo("Éxito", "Ruta creada exitosamente.")
+        self.vista.actualizar_visualizacion()
         self.destroy()
-        
 
 class FormularioBorrarArista(tk.Frame):
-    def __init__(self, grafo, master=None):
+    def __init__(self, grafo, master=None, vista=None):
         super().__init__(master)
         self.grafo = grafo
+        self.vista = vista
         self.configure(bg='#E0E0E0')
         self.pack(fill="both", expand=True)
 
@@ -329,6 +354,7 @@ class FormularioBorrarArista(tk.Frame):
         # Borrar la arista del grafo
         self.grafo.borrar_arista(lugar_1, lugar_2)
         messagebox.showinfo("Éxito", "Ruta borrada exitosamente.")
+        self.vista.actualizar_visualizacion()
         self.destroy()
         
 class FormularioFB(tk.Frame):
